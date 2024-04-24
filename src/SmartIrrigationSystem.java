@@ -47,6 +47,21 @@ public class SmartIrrigationSystem {
         System.out.println("Fertilizer applied to the crops.");
     }
 
+    private void adjustAdvancedIrrigationSchedul() {
+        Scanner input = new Scanner(System.in);
+        System.out.println("Enter the new duration (minutes per session): ");
+        int newDuration = input.nextInt();
+        System.out.println("Enter the new frequency: ");
+        int newFrequency = input.nextInt();
+        AdvancedIrrigationStrategy advancedIrrigationStrategy = new AdvancedIrrigationStrategy(moistureSensor, weatherSensor, 100.0, "Clay", "Hilly", newDuration, newFrequency);
+        advancedIrrigationStrategy.adjustIrrigationSchedule();
+    }
+
+    private void considerSoilTypeAndTopography() {
+        AdvancedIrrigationStrategy advancedIrrigationStrategy = new AdvancedIrrigationStrategy(moistureSensor, weatherSensor, 100.0, "Clay", "Hilly", 30, 3);
+        advancedIrrigationStrategy.considerSoilTypeAndTopography();
+    }
+
     private void optimizeResourceUsage() {
         System.out.println("Optimizing water and energy usage...");
         double moistureLevel = moistureSensor.readMoistureLevel();
@@ -431,7 +446,9 @@ public class SmartIrrigationSystem {
             System.out.println("10. Waste Management");
             System.out.println("11. Carbon Footprint Reduction");
             System.out.println("12. Farm Decision Making");
-            System.out.println("13. Exit");
+            System.out.println("13. Irrigation Schedule");
+            System.out.println("14. Soil Information");
+            System.out.println("15. Exit");
             System.out.println("Enter your choice: ");
 
             int choice = scanner.nextInt();
@@ -475,6 +492,12 @@ public class SmartIrrigationSystem {
                     manageFarmDecisions();
                     break;
                 case 13:
+                    adjustAdvancedIrrigationSchedul();
+                    break;
+                case 14:
+                    considerSoilTypeAndTopography();
+                    break;
+                case 15:
                     displaySystemStatus();
                     System.exit(0);
                 default:
