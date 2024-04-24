@@ -1,4 +1,4 @@
-public class WeatherSensor implements Sensor{
+public class WeatherSensor implements Sensor {
     @Override
     public String readWeatherCondition() {
         String[] conditions = {"Sunny", "Cloudy", "Rainy", "Windy", "Stormy"};
@@ -6,8 +6,4 @@ public class WeatherSensor implements Sensor{
         return conditions[index];
     }
 
-    @Override
-    public double readMoistureLevel() {
-        return Math.random() * 100;
-    }
 }

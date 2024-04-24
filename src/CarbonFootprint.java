@@ -1,8 +1,4 @@
-public class CarbonFootprint {
-    void trackEmissions() {
-        System.out.println("Tracking emissions...");
-    }
-    void reduceEmissions() {
-        System.out.println("Reducing emissions...");
-    }
+public interface CarbonFootprint {
+    void trackEmissions();
+    void reduceEmissions();
 }

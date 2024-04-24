@@ -1,4 +1,4 @@
-public class CarbonFootprintReduction extends CarbonFootprint{
+public class CarbonFootPrintManager implements CarbonFootprint{
     @Override
     public void trackEmissions() {
         System.out.println("Tracking emissions from farm activities...");
@@ -6,6 +6,6 @@ public class CarbonFootprintReduction extends CarbonFootprint{
 
     @Override
     public void reduceEmissions() {
-        System.out.println("Implementing measures to reduce emissions...");
+        System.out.println("Identifying and implementing measures to reduce carbon emissions...");
     }
 }

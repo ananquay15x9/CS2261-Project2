@@ -2,12 +2,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class BasicIrrigationStrategy extends IrrigationStrategy{
+
     @Override
-    public double determineIrrigationAmount(double moistureLevel, String weatherCondition) {
+    public double determineIrrigationAmount(double moistureLevel, String weatherCondition, double cropWaterRequirement) {
         double moistureThreshold = 30.0; //can be adjusted
 
-        if (moistureLevel < moistureThreshold) {
-            return 50.0; //can be adjusted.
+        if (moistureLevel < moistureThreshold && !weatherCondition.equals("Rainy")) {
+            return cropWaterRequirement; //can be adjusted.
         } else {
             //If moisture level is above threshold, no irrigation needed.
             return 0.0;

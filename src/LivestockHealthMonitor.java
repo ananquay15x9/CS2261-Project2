@@ -1,15 +1,14 @@
 public class LivestockHealthMonitor {
-    private String healthIndicator;
-    private String dietRequirement;
-    public LivestockHealthMonitor(String healthIndicator) {
-        this.healthIndicator = healthIndicator;
+    public void viewHealthIndicators(Livestock livestock) {
+        System.out.println("Livestock Health Indicators for " + livestock.getName() + ": " +
+                "- Weight: " + livestock.getWeight() + " kg " +
+                "- Temperature: " + livestock.getTemperature() + "°C " +
+                "- Heart Rate: " + livestock.getHeartRate() + " bpm " +
+                "- Respiratory Rate: " + livestock.getRespiratoryRate() + " bpm " +
+                "Activity Level: " + livestock.getHealthStatus());
     }
 
-    public void monitorHealthStatus(Livestock livestock) {
-        System.out.println("Type: " + livestock.getType() + " - " + "Health indicator: " + healthIndicator);
-    }
-
-    public void administerMedication(Livestock livestock, String medication) {
-        System.out.println("Administering medication to " + livestock.getType() + ": " + medication);
+    public void trackHealthTrends(Livestock livestock) {
+        System.out.println("Livestock Health Trends: - Weight Trend: Stable - Temperature Trend: Increasing - Heart Rate Trend: Normal - Respiratory Rate Trend: Decreasing");
     }
 }

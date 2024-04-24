@@ -8,39 +8,43 @@ public class AdvancedIrrigationStrategy extends IrrigationStrategy{
     private double cropWaterRequirement;
     private String soilType;
     private String topography;
+    private int duration;
+    private int frequency;
 
-    public AdvancedIrrigationStrategy(Sensor moistureSensor, Sensor weatherSensor, double cropWaterRequirement, String soilType, String topography) {
+    public AdvancedIrrigationStrategy(Sensor moistureSensor, Sensor weatherSensor, double cropWaterRequirement, String soilType, String topography, int duration, int frequency) {
         this.moistureSensor = moistureSensor;
         this.weatherSensor = weatherSensor;
         this.cropWaterRequirement = cropWaterRequirement;
         this.soilType = soilType;
         this.topography = topography;
+        this.duration = duration;
+        this.frequency = frequency;
     }
+
+
     @Override
-    public double determineIrrigationAmount(double moistureLevel, String weatherCondition) {
+    public double determineIrrigationAmount(double moistureLevel, String weatherCondition, double cropWaterRequirement) {
+        double irrigationRate = 1.0; //Gallons per minutes
         double moistureThresholdLow = 20.0;
         double moistureThresholdMedium = 50.0;
         double irrigationAmount = 0.0; //Start irrigation
 
         if (weatherCondition.equals("Rainy")) {
-            irrigationAmount = 0.0; //no need to irrigate
-    } else {
             if (moistureLevel < moistureThresholdLow) {
-                irrigationAmount = cropWaterRequirement * 0.7; //let's say 70% of crop water requirement
+                irrigationAmount = cropWaterRequirement * 0.7;
             } else if (moistureLevel < moistureThresholdMedium) {
                 irrigationAmount = cropWaterRequirement * 0.3;
-            } else {
-                irrigationAmount = 0.0;
             }
         }
-        return irrigationAmount;
-}
+
+        double totalWaterUsage = irrigationRate * duration * frequency;
+        return Math.min(irrigationAmount, totalWaterUsage);
+    }
 
     @Override
     public void scheduleIrrigation() {
         Timer timer = new Timer();
-        long delay = 0;
-        long period = 24 * 60 * 60 * 1000;
+        long period = 86400000; //24 hours in milliseconds
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -48,14 +52,16 @@ public class AdvancedIrrigationStrategy extends IrrigationStrategy{
                 double moistureLevel = moistureSensor.readMoistureLevel();
                 String weatherCondition = weatherSensor.readWeatherCondition();
 
-                double irrigationAmount = determineIrrigationAmount(moistureLevel, weatherCondition);
+                double irrigationAmount = determineIrrigationAmount(moistureLevel, weatherCondition, cropWaterRequirement);
 
                 //Print some info
-                System.out.println("Moisture Level: " + moistureLevel);
-                System.out.println("Weather Condition: " + weatherCondition);
-                System.out.println("Irrigation Amount: " + irrigationAmount);
+                if (irrigationAmount > 0) {
+                    System.out.println("Irrigation scheduled. Amount: " + irrigationAmount + " gallons.");
+                } else {
+                    System.out.println("No irrigation needed at this time.");
+                }
             }
-        }, delay, period);
+        }, 0, period);
     }
 
     public void adjustIrrigationSchedule() {

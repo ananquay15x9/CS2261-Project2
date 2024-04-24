@@ -1,4 +1,8 @@
 public interface Sensor {
-    double readMoistureLevel();
-    String readWeatherCondition();
+    default double readMoistureLevel() {
+        return -1;
+    }
+    default String readWeatherCondition() {
+        return "Unknown";
+    }
 }
