@@ -2,24 +2,19 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class SmartIrrigationSystem {
-    private Sensor moistureSensor;
-    private Sensor weatherSensor;
-    private IrrigationStrategy irrigationStrategy;
-    private LivestockHealthMonitor livestockHealthMonitor;
-    private LivestockProductionManager livestockProductionManager;
-    private static final String[] FREQUENCY_OPTIONS = {"Twice a day", "Once a day", "Three times a day"};
-    private static final int[] DURATION_OPTIONS = {15, 30, 10}; // Duration options in minutes
+    private final Sensor moistureSensor; //added final
+    private final Sensor weatherSensor; //added final
+    private final IrrigationStrategy irrigationStrategy; //added finalF
     private static final Random random = new Random();
     private String frequency;
     private int duration;
+
 
 
     public SmartIrrigationSystem(Sensor moistureSensor, Sensor weatherSensor, IrrigationStrategy irrigationStrategy, LivestockHealthMonitor livestockHealthMonitor, LivestockProductionManager livestockProductionManager) {
         this.moistureSensor = moistureSensor;
         this.weatherSensor = weatherSensor;
         this.irrigationStrategy = irrigationStrategy;
-        this.livestockHealthMonitor = livestockHealthMonitor;
-        this.livestockProductionManager = livestockProductionManager;
     }
 
     public void collectSensorDataAndIrrigate() {
@@ -47,7 +42,7 @@ public class SmartIrrigationSystem {
         System.out.println("Fertilizer applied to the crops.");
     }
 
-    private void adjustAdvancedIrrigationSchedul() {
+    private void adjustAdvancedIrrigationSchedule() {
         Scanner input = new Scanner(System.in);
         System.out.println("Enter the new duration (minutes per session): ");
         int newDuration = input.nextInt();
@@ -62,25 +57,34 @@ public class SmartIrrigationSystem {
         advancedIrrigationStrategy.considerSoilTypeAndTopography();
     }
 
-    private void optimizeResourceUsage() {
+    private void optimizeResourceUsage(String formattedMoistureLevel) {
         System.out.println("Optimizing water and energy usage...");
-        double moistureLevel = moistureSensor.readMoistureLevel();
         String weatherCondition = weatherSensor.readWeatherCondition();
 
         IrrigationSystem irrigationSystem = new IrrigationSystem();
-        irrigationSystem.optimizeWaterUsage(moistureLevel, weatherCondition);
+        //irrigationSystem.optimizeWaterUsage(moistureLevel, weatherCondition);
+        String moistureStatus;
+        if (Double.parseDouble(formattedMoistureLevel) > 60) {
+            moistureStatus = "Consider optimize your water and energy to save resource usage.";
+        } else if (Double.parseDouble(formattedMoistureLevel) <= 40) {
+            moistureStatus = "Consider more irrigation for your soil.";
+        } else {
+            moistureStatus = "No actions needed.";
+        }
         irrigationSystem.optimizeEnergyUsage(weatherCondition);
+        irrigationSystem.optimizeWaterUsage(Double.parseDouble(formattedMoistureLevel), weatherCondition);
+        System.out.println(moistureStatus);
         System.out.println("Water and energy usage optimized successfully.");
     }
 
     private void monitorCropHealth() {
-        int numCropsAffected = getRandomNumber(0,3);
-        if (numCropsAffected > 0) {
-            System.out.println("Crop health issues detected. Taking necessary actions.");
-
-            for (int i = 0; i < numCropsAffected; i++) {
-                String crop = getRandomCrop(); //Randomly select a crop
-                System.out.println("Action for " + crop + ": " + getActionForCrop(crop));
+        if (isCropHealthCheckNeeded()) {
+            String crop = getRandomCrop();
+            String action = getActionForCrop(crop);
+            if (!action.isEmpty()) {
+                System.out.println("Action for " + crop + ": " + action);
+            } else {
+                System.out.println("No action needed.");
             }
         } else {
             System.out.println("Crop health is good. No issues detected.");
@@ -115,29 +119,27 @@ public class SmartIrrigationSystem {
         }
     }
 
-    private int getRandomNumber(int min, int max) {
+   private int getRandomNumber(int min, int max) {
         return min + (int) (Math.random() * ((max - min) + 1));
     }
+
 
     private String getRandomCrop() {
         String[] crops = {"Corn", "Tomatoes", "Wheat"};
         return crops[getRandomNumber(0, 2)];
     }
 
+    private boolean isCropHealthCheckNeeded() {
+        return new Random().nextBoolean();
+    }
+
     private String getActionForCrop(String crop) {
-        String action = "";
-        switch (crop) {
-            case "Corn":
-                action = "Apply targeted pesticide to address pests or diseases.";
-                break;
-            case "Tomatoes":
-                action = "Increase watering frequency and apply balanced fertilizer.";
-                break;
-            case "Wheat":
-                action = "Check for signs of fungal infection and apply appropriate fungicides. Adjust irrigation settings to ensure adequate moisture without waterlogging.";
-                break;
-        }
-        return action;
+        return switch (crop) {
+            case "Corn" -> "Apply targeted pesticide to address pests or diseases.";
+            case "Tomatoes" -> "Increase watering frequency and apply balanced fertilizer.";
+            case "Wheat" -> "Check for signs of fungal infection and apply appropriate fungicides. Adjust irrigation settings to ensure adequate moisture without water logging.";
+            default -> "No action needed.";
+        };
     }
 
     public boolean detectPestPresence() {
@@ -152,9 +154,16 @@ public class SmartIrrigationSystem {
     }
 
     private void viewSensorData() {
-        double moistureLevel = moistureSensor.readMoistureLevel();
+        double moistureLevel;
         String weatherCondition = weatherSensor.readWeatherCondition();
-        String formattedMoistureLevel = String.format("%.2f", moistureLevel);
+        String formattedMoistureLevel;
+
+        if (weatherCondition != null && !weatherCondition.isEmpty()) {
+            moistureLevel = moistureSensor.readMoistureLevel(weatherCondition);
+        } else {
+            moistureLevel = moistureSensor.readMoistureLevel();
+        }
+        formattedMoistureLevel = String.format("%.2f", moistureLevel);
         System.out.println("Sensor Data:");
         System.out.println("Moisture Level: " + formattedMoistureLevel + "%");
         System.out.println("Weather Condition: " + weatherCondition);
@@ -185,7 +194,6 @@ public class SmartIrrigationSystem {
         duration = getRandomDuration();
 
         //Determine irrigation amount based on current sensor readings and crop requirements
-        double irrigationAmount = ((AdvancedIrrigationStrategy) irrigationStrategy).determineIrrigationAmount(moistureSensor.readMoistureLevel(), weatherSensor.readWeatherCondition(), 100.0);
         String formattedMoistureLevel = String.format("%.2f", moistureSensor.readMoistureLevel());
         System.out.println("Irrigation Scheduling Preferences Updated: ");
         System.out.println("Frequency: " + frequencyNumber);
@@ -193,12 +201,17 @@ public class SmartIrrigationSystem {
         System.out.println("Moisture Level: " + formattedMoistureLevel + "%");
         System.out.println("Irrigation Amount: " + duration * frequencyNumber + " gallons");
 
+        double moistureLevel = Double.parseDouble(formattedMoistureLevel);
         //Based on the determined irrigation amount, update irrigation tasks
-        if (irrigationAmount > 0) {
-            System.out.println("Irrigation needed. Scheduling based on new settings...");
-        } else {
+        if (moistureLevel <= 40) {
+            System.out.println("Moisture level is low. More irrigation please...");
+        } else if (moistureLevel > 60){
             System.out.println("Soil moisture level is sufficient.");
+        } else {
+            System.out.println("Moisture level is moderate. No immediate action required.");
         }
+
+        optimizeResourceUsage(formattedMoistureLevel);
 
     }
 
@@ -212,21 +225,12 @@ public class SmartIrrigationSystem {
     }
 
     private void generateResourceUsageReport(String frequency, int duration) {
-        int multiplier = mapFrequencyToNumber(frequency);
-        switch (frequency) {
-            case "Once a day":
-                multiplier = 1;
-                break;
-            case "Twice a day":
-                multiplier = 2;
-                break;
-            case "Three times a day":
-                multiplier = 3;
-                break;
-            default:
-                multiplier = 1; // Default to once a day if frequency is not recognized
-                break;
-        }
+        int multiplier = switch (frequency) {
+            case "Twice a day" -> 2;
+            case "Three times a day" -> 3;
+            default -> 1; //Once a day
+
+        };
         double totalWaterUsagePerDay = duration * multiplier;
         double totalHoursPerDay = (duration * multiplier) / 60.0; //convert duration from minutes to hours for energy calculation
         double powerConsumption = 1.0;  //kW
@@ -240,39 +244,10 @@ public class SmartIrrigationSystem {
 
     }
 
-    private Livestock createRandomLivestock(String healthStatus, String dietRequirements) {
-        String[] livestockOptions = {"Cow", "Chicken"};
-        Random random1 = new Random();
-        String randomType = livestockOptions[random1.nextInt(livestockOptions.length)];
-        double weight = 100 + 400 * random1.nextDouble(); // Random weight between 100 and 500
-        double temperature = 37 + 2 * random1.nextDouble(); // Random temperature between 37 and 39
-        int heartRate = 60 + random1.nextInt(41); // Random heart rate between 60 and 100
-        int respiratoryRate = 15 + random1.nextInt(11); // Random respiratory rate between 15 and 25
-
-        Livestock livestock;
-        switch (randomType) {
-            case "Cow":
-                livestock = new Cow("Random Cow", healthStatus, dietRequirements);
-                break;
-            case "Chicken":
-                livestock = new Chicken("Random Chicken", healthStatus, dietRequirements);
-                break;
-            default:
-                return null;
-        }
-
-        // Optionally set additional properties if needed
-        livestock.setWeight(weight);
-        livestock.setTemperature(temperature);
-        livestock.setHeartRate(heartRate);
-        livestock.setRespiratoryRate(respiratoryRate);
-
-        return livestock;
-    }
 
     private void monitorLivestockHealth() {
         Scanner scanner = new Scanner(System.in);
-        Livestock livestock = null;
+        Livestock livestock; // it was Livestock livestock = null;
         System.out.println("Select the type of livestock:");
         System.out.println("1. Cow");
         System.out.println("2. Cattle");
@@ -337,7 +312,28 @@ public class SmartIrrigationSystem {
         }
     }
 
-    private void viewCropInformation() {
+    private String detectCropNutrients() {
+        String[] cropNutrients = {"healthy", "unhealthy", "mildly ill", "sickly"};
+        return cropNutrients[random.nextInt(cropNutrients.length)];
+    }
+
+    private String detectCropGrowth() {
+        String[] cropGrowth = {"fully grown", "middle stage growth", "hasn't grown yet", "just planted"};
+        return cropGrowth[random.nextInt(cropGrowth.length)];
+    }
+
+    private String detectCropDisease(String nutrientStatus) {
+        Random rand = new Random();
+        double diseaseProbability = switch (nutrientStatus) {
+            case "healthy" -> 0.1; //10% chance of disease if healthy
+            case "unhealthy", "mildly ill" -> 0.5; //50% chance if not optimal
+            case "sickly" -> 0.8; //80% chance if very poor
+            default -> 0.3;
+        };
+        return rand.nextDouble() < diseaseProbability ? "diseases detected" : "diseases not detected";
+    }
+
+    /*private void viewCropInformation() {
         Random random = new Random();
         // Define possible values for the attributes
         String[] growthStages = {"Seedling", "Flowering", "Fruiting", "Mature"};
@@ -365,6 +361,49 @@ public class SmartIrrigationSystem {
         tomatoes.displayDetails();
         wheat.displayDetails();
     }
+
+     */
+
+    private void cropFertilizationDecision(String nutrientStatus) {
+        switch (nutrientStatus) {
+            case "healthy":
+                System.out.println("Fertilization is not needed due to healthy nutrients.");
+                break;
+            case "unhealthy":
+                System.out.println("Fertilization is needed at convenience.");
+                break;
+            case "mildly ill":
+                System.out.println("Fertilization is needed NOW.");
+                break;
+            case "sickly":
+                System.out.println("Fertilization CANNOT wait.");
+                break;
+            default:
+                System.out.println("Check crop status.");
+                break;
+        }
+    }
+
+    private void viewCropInformation() {
+        String[] cropNames = {"Corn", "Tomatoes", "Wheat"};
+        int randomIndex = random.nextInt(cropNames.length); // Get a random index for one crop
+
+        String cropName = cropNames[randomIndex];
+        String growth = detectCropGrowth();
+        String nutrients = detectCropNutrients();
+        String disease = detectCropDisease(nutrients);
+
+        System.out.println("Crop Information:");
+        System.out.println("Name: " + cropName);
+        System.out.println("Stage: " + growth);
+        System.out.println("Nutrient: " + nutrients);
+        System.out.println("Status: " + disease);
+        cropFertilizationDecision(nutrients);
+        System.out.println();
+    }
+
+
+
 
 
     private void manageCarbonFootprint() {
@@ -430,9 +469,9 @@ public class SmartIrrigationSystem {
 
     public void startMenu() {
         Scanner scanner = new Scanner(System.in);
-        boolean running = true;
+        //boolean running = true;
 
-        while (running) {
+        while (true) {
             System.out.println("==== Smart Irrigation System Menu ====");
             System.out.println("1. View Sensor Data");
             System.out.println("2. Adjust Irrigation Settings");
@@ -442,72 +481,84 @@ public class SmartIrrigationSystem {
             System.out.println("6. Manage Crops");
             System.out.println("7. Monitor Crop Health");
             System.out.println("8. Apply Fertilizer");
-            System.out.println("9. Water and Energy Usage Optimization");
-            System.out.println("10. Waste Management");
-            System.out.println("11. Carbon Footprint Reduction");
-            System.out.println("12. Farm Decision Making");
-            System.out.println("13. Irrigation Schedule");
-            System.out.println("14. Soil Information");
-            System.out.println("15. Exit");
+            System.out.println("9. Waste Management");
+            System.out.println("10. Carbon Footprint Reduction");
+            System.out.println("11. Farm Decision Making");
+            System.out.println("12. Irrigation Schedule");
+            System.out.println("13. Soil Information");
+            System.out.println("14. Exit");
             System.out.println("Enter your choice: ");
+            System.out.println();
 
             int choice = scanner.nextInt();
 
             switch (choice) {
                 case 1:
                     viewSensorData();
+                    System.out.println();
                     break;
                 case 2:
                     adjustIrrigationSettings();
+                    System.out.println();
                     break;
                 case 3:
                     adjustFertilizationSettings();
+                    System.out.println();
                     break;
                 case 4:
                     adjustIrrigationSettings();
+                    System.out.println();
                     generateResourceUsageReport(frequency, duration);
+                    System.out.println();
                     break;
                 case 5:
                     monitorLivestockHealth();
+                    System.out.println();
                     break;
                 case 6:
                     viewCropInformation();
+                    System.out.println();
                     break;
                 case 7:
                     monitorCropHealth();
+                    System.out.println();
                     break;
                 case 8:
                     applyFertilizer();
+                    System.out.println();
                     break;
                 case 9:
-                    optimizeResourceUsage();
+                    manageWaste();
+                    System.out.println();
                     break;
                 case 10:
-                    manageWaste();
+                    manageCarbonFootprint();
+                    System.out.println();
                     break;
                 case 11:
-                    manageCarbonFootprint();
+                    manageFarmDecisions();
+                    System.out.println();
                     break;
                 case 12:
-                    manageFarmDecisions();
+                    adjustAdvancedIrrigationSchedule();
+                    System.out.println();
                     break;
                 case 13:
-                    adjustAdvancedIrrigationSchedul();
+                    considerSoilTypeAndTopography();
+                    System.out.println();
                     break;
                 case 14:
-                    considerSoilTypeAndTopography();
-                    break;
-                case 15:
                     displaySystemStatus();
+                    System.out.println("Thank you for using the Smart Irrigation System!");
                     System.exit(0);
                 default:
                     System.out.println("Invalid choice. Please try again.");
+                    System.out.println();
             }
         }
-        System.out.println("Thank you for using the Smart Irrigation System!");
     }
 
-    public static void main(String[] args) {
+    private static SmartIrrigationSystem initializeSystem() {
         Sensor moistureSensor = new SoilMoistureSensor();
         Sensor weatherSensor = new WeatherSensor();
         int defaultDuration = 30;
@@ -519,9 +570,14 @@ public class SmartIrrigationSystem {
         //Create livestock health
         LivestockHealthMonitor livestockHealthMonitor = new LivestockHealthMonitor();
         LivestockProductionManager livestockProductionManager = new LivestockProductionManager();
+        return new SmartIrrigationSystem(moistureSensor, weatherSensor, irrigationStrategy, livestockHealthMonitor, livestockProductionManager);
+
+    }
+
+    public static void main(String[] args) {
 
         //Create the smart farming system
-        SmartIrrigationSystem irrigationSystem = new SmartIrrigationSystem(moistureSensor, weatherSensor, irrigationStrategy, livestockHealthMonitor, livestockProductionManager);
+        SmartIrrigationSystem irrigationSystem = initializeSystem();
 
         //Start the menu
         irrigationSystem.startMenu();

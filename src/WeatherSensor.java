@@ -6,4 +6,8 @@ public class WeatherSensor implements Sensor {
         return conditions[index];
     }
 
+    @Override
+    public double readMoistureLevel(String weatherCondition) {
+        throw new UnsupportedOperationException("WeatherSensor cannot directly read moisture level.");
+    }
 }

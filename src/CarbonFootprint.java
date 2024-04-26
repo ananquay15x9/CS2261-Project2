@@ -1,4 +1,4 @@
 public interface CarbonFootprint {
-    void trackEmissions();
+    double trackEmissions();
     void reduceEmissions();
 }

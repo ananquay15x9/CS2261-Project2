@@ -15,7 +15,7 @@ public class IrrigationSystem implements ResourceOptimization{
         if (weatherCondition.equals("Sunny")) {
             System.out.println("Sunny weather detected. Optimizing energy usage for solar panel.");
         } else {
-            System.out.println("Non-sunny weather detected. Optimizing energy usage for efficient power consumption.");
+            System.out.println("Non-sunny weather detected. Using sources from batteries.");
         }
     }
 }
