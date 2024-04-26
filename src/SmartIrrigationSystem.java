@@ -333,37 +333,6 @@ public class SmartIrrigationSystem {
         return rand.nextDouble() < diseaseProbability ? "diseases detected" : "diseases not detected";
     }
 
-    /*private void viewCropInformation() {
-        Random random = new Random();
-        // Define possible values for the attributes
-        String[] growthStages = {"Seedling", "Flowering", "Fruiting", "Mature"};
-        String[] nutrientRequirements = {"Low", "Moderate", "High"};
-        String[] waterRequirements = {"Low", "Moderate", "High"};
-        String[] lightExposures = {"Full Sun", "Partial Shade", "Shade"};
-
-        Corn corn = new Corn(growthStages[random.nextInt(growthStages.length)],
-                nutrientRequirements[random.nextInt(nutrientRequirements.length)],
-                "Low",  // Assume susceptibility to diseases is static or has less variation
-                waterRequirements[random.nextInt(waterRequirements.length)],
-                lightExposures[random.nextInt(lightExposures.length)]);
-        Tomatoes tomatoes = new Tomatoes(growthStages[random.nextInt(growthStages.length)],
-                nutrientRequirements[random.nextInt(nutrientRequirements.length)],
-                "Medium",  // Assuming medium susceptibility for tomatoes
-                waterRequirements[random.nextInt(waterRequirements.length)],
-                lightExposures[random.nextInt(lightExposures.length)]);
-        Wheat wheat = new Wheat(growthStages[random.nextInt(growthStages.length)],
-                nutrientRequirements[random.nextInt(nutrientRequirements.length)],
-                "High",  // Assuming high susceptibility for wheat
-                waterRequirements[random.nextInt(waterRequirements.length)],
-                lightExposures[random.nextInt(lightExposures.length)]);
-        System.out.println("Crop Information: ");
-        corn.displayDetails();
-        tomatoes.displayDetails();
-        wheat.displayDetails();
-    }
-
-     */
-
     private void cropFertilizationDecision(String nutrientStatus) {
         switch (nutrientStatus) {
             case "healthy":
